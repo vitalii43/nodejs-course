@@ -1,3 +1,3 @@
 export const getRandomNumber = () => {
-  return Math.random() * 1000;
+  return Math.ceil(Math.random() * 1000);
 };
