@@ -1,3 +1,3 @@
-import { getRandomNumber } from "./getRandomNumber.js";
+import getRandomNumber from "./getRandomNumber.js";
 
 console.log(getRandomNumber());
