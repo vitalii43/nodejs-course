@@ -18,8 +18,7 @@ export const execCommand = (command) => {
   });
 };
 
-export const logToFile = (response) => {
-  const content = `${Math.floor(new Date().getTime() / 1000)}: ${response}\r`;
+export const logToFile = (content) => {
   fs.appendFile("activityMonitor.log", content, (err) => {
     if (err) {
       throw err;

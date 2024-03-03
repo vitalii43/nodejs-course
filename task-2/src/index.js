@@ -20,7 +20,9 @@ import {
       const res = await execCommand(command);
       console.clear();
       console.log(res.trim());
-      currentOutput = res.trim();
+      currentOutput = `${currentOutput}${Math.floor(
+        new Date().getTime() / 1000
+      )}: ${res.trim()}\r`;
     } catch (err) {
       console.log("Error during executing monitor command:", err);
       clearIntervals();
@@ -30,6 +32,7 @@ import {
   const fileInterval = setInterval(() => {
     try {
       logToFile(currentOutput);
+      currentOutput = "";
     } catch (err) {
       console.error("Error during writing to file: ", err);
       clearIntervals();
