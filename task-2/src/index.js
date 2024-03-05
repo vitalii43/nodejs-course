@@ -13,8 +13,9 @@ import {
   }
 
   let currentOutput = "";
+  let lastLogToFileTime = Date.now();
 
-  const consoleInterval = setInterval(async () => {
+  const interval = setInterval(async () => {
     try {
       const command = isUnixLike ? UNIX_COMMAND : WIN_COMMAND;
       const res = await execCommand(command);
@@ -25,22 +26,18 @@ import {
       )}: ${res.trim()}\r`;
     } catch (err) {
       console.log("Error during executing monitor command:", err);
-      clearIntervals();
+      clearInterval(interval);
+    }
+
+    if (Date.now() - lastLogToFileTime >= LOG_TO_FILE_INTERVAL) {
+      lastLogToFileTime = Date.now();
+      try {
+        logToFile(currentOutput);
+        currentOutput = "";
+      } catch (err) {
+        console.error("Error during writing to file: ", err);
+        clearInterval(interval);
+      }
     }
   }, REFRESH_INTERVAL);
-
-  const fileInterval = setInterval(() => {
-    try {
-      logToFile(currentOutput);
-      currentOutput = "";
-    } catch (err) {
-      console.error("Error during writing to file: ", err);
-      clearIntervals();
-    }
-  }, LOG_TO_FILE_INTERVAL);
-
-  const clearIntervals = () => {
-    clearInterval(fileInterval);
-    clearInterval(consoleInterval);
-  };
 })();

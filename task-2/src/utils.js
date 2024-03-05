@@ -3,7 +3,7 @@ import os from "os";
 import fs from "fs";
 
 const platform = os.platform();
-export const isUnixLike = platform === "darwin" || "linux";
+export const isUnixLike = platform === "darwin" || platform === "linux";
 export const isWindows = platform === "win32";
 
 export const execCommand = (command) => {
