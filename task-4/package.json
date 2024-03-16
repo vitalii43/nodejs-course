@@ -4,7 +4,8 @@
   "description": "",
   "main": "",
   "scripts": {
-    "test": "jest --watch",
+    "test": "jest --roots=src",
+    "test:e2e": "jest --roots=e2e",
     "test:coverage": "jest --coverage"
   },
   "author": "",
