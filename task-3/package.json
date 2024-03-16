@@ -1,0 +1,20 @@
+{
+  "name": "task-3",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "task-1": "nodemon src/task-1.ts",
+    "task-2": "nodemon src/task-2.ts",
+    "task-3": "nodemon src/task-3.ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.2"
+  },
+  "dependencies": {
+    "csvtojson": "^2.0.10",
+    "nodemon": "^3.1.0"
+  }
+}
