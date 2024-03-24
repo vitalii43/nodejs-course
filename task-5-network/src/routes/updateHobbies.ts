@@ -10,7 +10,8 @@ export const updateHobies = async (
   const userId = match?.[1] ?? "";
   res.setHeader("Content-Type", "application/json");
 
-  if (!getUser(userId)) {
+  const user = getUser(userId);
+  if (!user) {
     res.statusCode = 404;
     res.end({
       data: null,
@@ -28,10 +29,10 @@ export const updateHobies = async (
   res.end(
     JSON.stringify({
       data: {
-        hobbies: newHobbies,
-        link: {
-          self: `/api/users/${userId}/hobbies`,
-          user: `/api/users/${userId}`,
+        user,
+        links: {
+          self: `/api/users/${userId}`,
+          hobbies: `/api/users/${userId}/hobbies`,
         },
       },
       error: null,
