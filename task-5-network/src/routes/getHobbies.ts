@@ -11,10 +11,12 @@ export const getHobies = async (
 
   if (!getUser(userId)) {
     res.statusCode = 404;
-    res.end({
-      data: null,
-      error: `User with id ${userId} doesn't exist`,
-    });
+    res.end(
+      JSON.stringify({
+        data: null,
+        error: `User with id ${userId} doesn't exist`,
+      })
+    );
     return;
   }
   res.setHeader("Cache-Control", "max-age=3600");

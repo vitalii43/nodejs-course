@@ -13,10 +13,12 @@ export const updateHobies = async (
   const user = getUser(userId);
   if (!user) {
     res.statusCode = 404;
-    res.end({
-      data: null,
-      error: `User with id ${userId} doesn't exist`,
-    });
+    res.end(
+      JSON.stringify({
+        data: null,
+        error: `User with id ${userId} doesn't exist`,
+      })
+    );
     return;
   }
 
