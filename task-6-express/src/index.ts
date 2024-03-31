@@ -4,7 +4,7 @@ import { auth } from "./auth";
 import bodyParser from "body-parser";
 
 const app = express();
-const PORT = 8001;
+const PORT = 8000;
 
 app.use(auth);
 app.use(bodyParser.json());
