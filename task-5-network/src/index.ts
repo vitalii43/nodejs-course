@@ -8,7 +8,6 @@ import {
 } from "./routes";
 
 const server = http.createServer((req, res) => {
-  console.log(req.url, req.method);
   try {
     if (req.method === "GET" && /^\/api\/users$/.test(req.url ?? "")) {
       getUsers(req, res);
@@ -25,7 +24,6 @@ const server = http.createServer((req, res) => {
       /^\/api\/users\/[^\/]+$/.test(req.url ?? "")
     ) {
       deleteUser(req, res);
-      console.log("lol");
       return;
     }
 
