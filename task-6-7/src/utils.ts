@@ -20,7 +20,7 @@ export class ApplicationError extends Error {
 }
 
 export const getTotal = (cart: Cart) => {
-  return cart.items.reduce(
+  return cart.items?.reduce(
     (total, { product, count }) => total + product.price * count,
     0
   );

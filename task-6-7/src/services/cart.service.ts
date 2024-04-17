@@ -14,17 +14,17 @@ const getPartialCart = (cart: Cart) => {
 };
 
 export const getCartService = async (userId: string) => {
-  const cart = getCart(userId);
+  const cart = await getCart(userId);
 
   if (!cart) {
     return {
-      cart: getPartialCart(createCart(userId)),
+      cart: getPartialCart((await createCart(userId)).toObject()),
       total: 0,
     };
   }
 
   return {
-    cart: getPartialCart(cart),
+    cart: getPartialCart(cart.toObject()),
     total: getTotal(cart),
   };
 };
@@ -39,19 +39,26 @@ export const updateCartLineService = async (
     createCart(userId);
   }
 
-  const newCart = updateCartLine(userId, options);
+  const newCart = await updateCartLine(userId, options);
+
+  if (!newCart) {
+    throw new ApplicationError({
+      errorCode: AplicationErrorList.CartNotFound,
+    });
+  }
+
   return {
-    cart: getPartialCart(newCart),
+    cart: getPartialCart(newCart.toObject()),
     total: getTotal(newCart),
   };
 };
 
 export const emptyCartService = async (userId: string) => {
-  emptyCart(userId);
+  await emptyCart(userId);
 };
 
 export const checkoutService = async (userId: string) => {
-  const cart = getCart(userId);
+  const cart = await getCart(userId);
 
   if (!cart) {
     throw new ApplicationError({
@@ -59,7 +66,7 @@ export const checkoutService = async (userId: string) => {
     });
   }
 
-  const newOrder = createOrder(userId, cart);
-  emptyCart(cart.userId);
+  const newOrder = await createOrder(userId, cart);
+  await emptyCart(cart.userId);
   return newOrder;
 };

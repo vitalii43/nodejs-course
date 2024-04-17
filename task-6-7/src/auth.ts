@@ -12,16 +12,17 @@ export const auth = (req: Request, res: Response, next: NextFunction) => {
     });
   }
 
-  if (!isUserExist(userId)) {
-    return res.status(403).send({
-      data: null,
-      error: {
-        message: "You must be authorized user",
-      },
-    });
-  }
+  isUserExist(userId).then((isExist) => {
+    if (!isExist) {
+      return res.status(403).send({
+        data: null,
+        error: {
+          message: "You must be authorized user",
+        },
+      });
+    }
 
-  req.userId = userId;
-
-  next();
+    req.userId = userId;
+    next();
+  });
 };

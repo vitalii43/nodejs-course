@@ -2,9 +2,13 @@ import express, { Request, Response, NextFunction } from "express";
 import { productsRouter, cartRouter } from "./controllers";
 import { auth } from "./auth";
 import bodyParser from "body-parser";
+import mongoose from "mongoose";
+import { Product } from "./models/product";
 
 const app = express();
 const PORT = 8000;
+
+const uri: string = "mongodb://localhost:27017/shop";
 
 app.use(auth);
 app.use(bodyParser.json());
@@ -20,6 +24,13 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction): void => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+mongoose
+  .connect(uri)
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+  })
+  .catch((error: Error) => {
+    console.log(`Error connecting to MongoDB: ${error.message}`);
+  });

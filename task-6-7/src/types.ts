@@ -13,7 +13,7 @@ type CartLine = {
 };
 
 export type Cart = {
-  id: string;
+  _id: string;
   userId: string;
   items: CartLine[];
 };
