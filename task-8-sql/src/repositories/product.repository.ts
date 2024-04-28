@@ -1,14 +1,15 @@
-import { Product } from "../models";
+import { Product } from "../entities";
 import { AplicationErrorList, ApplicationError } from "../utils";
+import { DI } from "../index";
 
 export const getProducts = async () => {
-  const products = await Product.find();
+  const products = await DI.em.findAll(Product);
   return products;
 };
 
 export const getProductById = async (productId: string) => {
   try {
-    const product = await Product.findOne({ _id: productId });
+    const product = await DI.em.findOne(Product, productId);
     return product;
   } catch (err) {
     throw new ApplicationError({

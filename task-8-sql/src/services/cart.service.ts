@@ -5,27 +5,45 @@ import {
   emptyCart,
   createOrder,
 } from "../repositories";
-import { Cart, CartlineUpdateOptions } from "../types";
-import { AplicationErrorList, ApplicationError, getTotal } from "../utils";
+import { CartlineUpdateOptions } from "../types";
+import { Cart } from "../entities";
+import {
+  AplicationErrorList,
+  ApplicationError,
+  getCartTotal,
+  getOrderTotal,
+} from "../utils";
+import { wrap } from "@mikro-orm/core";
 
-const getPartialCart = (cart: Cart) => {
-  const { userId, ...partialCart } = cart;
-  return partialCart;
+const getPartialCart = async (cart: Cart) => {
+  if (cart.items) {
+    await wrap(cart.items).init();
+  }
+
+  return {
+    id: cart.id,
+    items: cart.items?.map(({ cart, ...item }) => item),
+  };
 };
 
 export const getCartService = async (userId: string) => {
   const cart = await getCart(userId);
 
   if (!cart) {
+    const cart = await createCart(userId);
+
     return {
-      cart: getPartialCart((await createCart(userId)).toObject()),
+      cart: {
+        id: cart.id,
+        items: [],
+      },
       total: 0,
     };
   }
 
   return {
-    cart: getPartialCart(cart.toObject()),
-    total: getTotal(cart),
+    cart: await getPartialCart(cart),
+    total: await getCartTotal(cart),
   };
 };
 
@@ -48,8 +66,8 @@ export const updateCartLineService = async (
   }
 
   return {
-    cart: getPartialCart(newCart.toObject()),
-    total: getTotal(newCart),
+    cart: await getPartialCart(newCart),
+    total: await getCartTotal(newCart),
   };
 };
 
@@ -66,7 +84,15 @@ export const checkoutService = async (userId: string) => {
     });
   }
 
-  const newOrder = await createOrder(userId, cart);
-  await emptyCart(cart.userId);
-  return newOrder;
+  const newOrder = await createOrder(cart);
+  const { user, ...partialOrder } = newOrder;
+  await emptyCart(cart.user.id);
+
+  const mappedOrder = {
+    ...partialOrder,
+    items: newOrder.items.map(({ order, ...item }) => item),
+    total: await getOrderTotal(newOrder),
+  };
+
+  return mappedOrder;
 };

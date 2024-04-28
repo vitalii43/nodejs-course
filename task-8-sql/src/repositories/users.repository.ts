@@ -1,9 +1,10 @@
-import { User } from "../models";
+import { User } from "../entities";
+import { DI } from "../index";
 
 // currently user added manualy in db
 export const isUserExist = async (id: string) => {
   try {
-    const user = await User.findOne({ _id: id });
+    const user = await DI.em.findOne(User, id);
     return user;
   } catch (err) {
     return false;
