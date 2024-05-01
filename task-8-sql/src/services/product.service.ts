@@ -9,7 +9,7 @@ export const getProductList = async () => {
 };
 
 export const getProduct = async (productId: string) => {
-  const product = getProductById(productId);
+  const product = await getProductById(productId);
   if (!product) {
     throw new ApplicationError({
       errorCode: AplicationErrorList.ProductNotFound,

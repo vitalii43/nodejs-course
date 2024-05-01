@@ -1,20 +1,31 @@
 import { getProductById } from "./product.repository";
 import { CartlineUpdateOptions } from "../types";
 import { ApplicationError, AplicationErrorList } from "../utils";
-import { Cart } from "../models";
+import { Cart, CartLine, User } from "../entities";
+import { DI } from "..";
 
 export const createCart = async (userId: string) => {
-  const newCart = new Cart({
-    userId: userId,
-    items: [],
-  }).save();
+  const user = await DI.em.findOne(User, userId);
+
+  if (!user) {
+    throw new ApplicationError({
+      errorCode: AplicationErrorList.UserNotFound,
+    });
+  }
+
+  const newCart = new Cart(user);
+  await DI.em.persist(newCart).flush();
 
   return newCart;
 };
 
 export const getCart = async (userId: string) => {
   try {
-    return await Cart.findOne({ userId });
+    return await DI.em.findOne(
+      Cart,
+      { user: userId },
+      { populate: ["items", "user", "items.product"] }
+    );
   } catch (err) {
     throw new ApplicationError({
       errorCode: AplicationErrorList.CartNotFound,
@@ -27,12 +38,19 @@ export const updateCartLine = async (
   { productId, count }: CartlineUpdateOptions
 ) => {
   const cart = await getCart(userId);
-
-  let cartlineExist = cart?.items.some(
-    ({ product }) => product.id === productId
+  const cartLine = await DI.em.findOne(
+    CartLine,
+    { cart, product: productId },
+    { populate: ["product"] }
   );
 
-  if (!cartlineExist) {
+  if (!cart) {
+    throw new ApplicationError({
+      errorCode: AplicationErrorList.CartNotFound,
+    });
+  }
+
+  if (!cartLine) {
     const product = await getProductById(productId);
 
     if (!product) {
@@ -40,22 +58,23 @@ export const updateCartLine = async (
         errorCode: AplicationErrorList.ProductNotFound,
       });
     }
-    return await Cart.findOneAndUpdate(
-      { userId: userId },
-      { $push: { items: { product, count } } },
-      { new: true }
-    );
+
+    const newCartLine = new CartLine(cart, product, count);
+    DI.em.persist(newCartLine);
   } else {
-    return await Cart.findOneAndUpdate(
-      { userId: userId, "items.product._id": productId },
-      { $set: { "items.$.count": count } },
-      { new: true }
-    );
+    cartLine.count = count;
   }
+
+  await DI.em.flush();
+  return cart;
 };
 
 export const emptyCart = async (userId: string) => {
-  const cart = await Cart.updateOne({ userId }, { $set: { items: [] } });
+  const cart = await getCart(userId);
+
+  DI.em.nativeDelete(CartLine, {
+    cart,
+  });
 
   return cart;
 };
