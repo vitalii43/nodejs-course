@@ -54,8 +54,12 @@ export const updateCartLine = async (
   }
 };
 
-export const emptyCart = async (userId: string) => {
+export const emptyCartByUserId = async (userId: string) => {
   const cart = await Cart.updateOne({ userId }, { $set: { items: [] } });
+  return cart;
+};
 
+export const emptyCartById = async (cartId: string) => {
+  const cart = await Cart.updateOne({ _id: cartId }, { $set: { items: [] } });
   return cart;
 };

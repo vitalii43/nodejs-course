@@ -41,3 +41,9 @@ export type Order = {
   status: OrderStatus;
   total: number;
 };
+
+export interface CurrentUser {
+  id: string;
+  email: string;
+  role: string;
+}
