@@ -1,36 +1,35 @@
+import dotenv from "dotenv";
 import express, { Request, Response, NextFunction } from "express";
-import { productsRouter, cartRouter } from "./controllers";
-import { auth } from "./auth";
+dotenv.config();
+import { productsRouter, cartRouter, authRouter } from "./controllers";
+import { auth } from "./middlewares";
 import bodyParser from "body-parser";
-import mongoose from "mongoose";
-import { Product } from "./models/product";
+import { connect } from "./database";
 
-const app = express();
-const PORT = 8000;
+(async () => {
+  const port = process.env.APP_PORT ?? 8080;
+  const app = express();
 
-const uri: string = "mongodb://localhost:27017/shop";
+  app.use(bodyParser.json());
+  app.use("/api/auth", authRouter);
+  app.use(auth);
+  app.use("/api/products", productsRouter);
+  app.use("/api/profile/cart", cartRouter);
+  app.use(
+    (err: Error, req: Request, res: Response, next: NextFunction): void => {
+      res.status(500);
+      res.send({
+        data: null,
+        error: {
+          message: "Internal Server error",
+        },
+      });
+    }
+  );
 
-app.use(auth);
-app.use(bodyParser.json());
-app.use("/api/products", productsRouter);
-app.use("/api/profile/cart", cartRouter);
-app.use((err: Error, req: Request, res: Response, next: NextFunction): void => {
-  res.status(500);
-  res.send({
-    data: null,
-    error: {
-      message: "Internal Server error",
-    },
+  await connect();
+
+  app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
   });
-});
-
-mongoose
-  .connect(uri)
-  .then(() => {
-    app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
-    });
-  })
-  .catch((error: Error) => {
-    console.log(`Error connecting to MongoDB: ${error.message}`);
-  });
+})();

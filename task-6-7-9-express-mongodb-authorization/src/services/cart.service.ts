@@ -2,7 +2,8 @@ import {
   getCart,
   createCart,
   updateCartLine,
-  emptyCart,
+  emptyCartByUserId,
+  emptyCartById,
   createOrder,
 } from "../repositories";
 import { Cart, CartlineUpdateOptions } from "../types";
@@ -33,10 +34,11 @@ export const updateCartLineService = async (
   userId: string,
   options: CartlineUpdateOptions
 ) => {
-  const cart = getCart(userId);
+  const cart = await getCart(userId);
 
   if (!cart) {
-    createCart(userId);
+    console.log(111, userId);
+    await createCart(userId);
   }
 
   const newCart = await updateCartLine(userId, options);
@@ -53,8 +55,8 @@ export const updateCartLineService = async (
   };
 };
 
-export const emptyCartService = async (userId: string) => {
-  await emptyCart(userId);
+export const emptyCartService = async (cartId: string) => {
+  await emptyCartById(cartId);
 };
 
 export const checkoutService = async (userId: string) => {
@@ -67,6 +69,6 @@ export const checkoutService = async (userId: string) => {
   }
 
   const newOrder = await createOrder(userId, cart);
-  await emptyCart(cart.userId);
+  await emptyCartByUserId(cart.userId);
   return newOrder;
 };

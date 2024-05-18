@@ -7,17 +7,19 @@ import {
 } from "../services";
 import { AplicationErrorList, ApplicationError } from "../utils";
 import { cartlineUpdatePayloadValidation } from "./validations";
+import { isAuthor } from "../middlewares";
 
 export const cartRouter = express.Router();
 
 cartRouter.get("/", async (req, res) => {
-  const cart = await getCartService(req.userId);
+  const cart = await getCartService(req.user.id);
   res.send({ data: cart, error: null });
 });
 
 cartRouter.put("/", cartlineUpdatePayloadValidation, async (req, res) => {
   try {
-    const cart = await updateCartLineService(req.userId, req.body);
+    console.log("req.user 000", req.user);
+    const cart = await updateCartLineService(req.user.id, req.body);
     res.send({ data: cart, error: null });
   } catch (err) {
     if (!(err instanceof ApplicationError)) {
@@ -47,8 +49,8 @@ cartRouter.put("/", cartlineUpdatePayloadValidation, async (req, res) => {
   }
 });
 
-cartRouter.delete("/", async (req, res) => {
-  await emptyCartService(req.userId);
+cartRouter.delete("/:id", isAuthor, async (req, res) => {
+  await emptyCartService(req.params.id);
   res.send({
     data: {
       success: true,
@@ -59,7 +61,7 @@ cartRouter.delete("/", async (req, res) => {
 
 cartRouter.post("/checkout", async (req, res) => {
   try {
-    const order = await checkoutService(req.userId);
+    const order = await checkoutService(req.user.id);
     res.send({
       data: {
         order,
