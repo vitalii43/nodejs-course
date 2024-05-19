@@ -1,3 +1,4 @@
+import { logger } from "./logger";
 import { Cart } from "./types";
 
 export enum AplicationErrorList {
@@ -16,6 +17,7 @@ export class ApplicationError extends Error {
   constructor({ message, errorCode }: ApplicationErrorOptions) {
     super(message ?? "");
     this.errorCode = errorCode;
+    logger.error(`${errorCode}: ${message}, \n ${this.stack}`);
   }
 }
 
