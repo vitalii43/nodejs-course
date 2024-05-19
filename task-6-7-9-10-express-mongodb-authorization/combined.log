@@ -1,0 +1,8 @@
+{"level":"info","message":"Server is running on port 8000","service":"user-service"}
+{"level":"info","message":"Closed out remaining connections","service":"user-service"}
+{"level":"info","message":"Server is running on port 8000","service":"user-service"}
+{"level":"info","message":"Closed out remaining connections","service":"user-service"}
+{"level":"info","message":"Server is running on port 8000","service":"user-service"}
+{"level":"info","message":"POST /api/auth/login - 141ms","meta":{},"service":"user-service"}
+{"level":"info","message":"Server is running on port 8000","service":"user-service"}
+{"level":"info","message":"Closed out remaining connections","service":"user-service"}
